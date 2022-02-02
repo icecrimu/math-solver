@@ -12,4 +12,20 @@ form.addEventListener("submit", e => {
   outputElement.textContent = result
 })
 
-function parse(equation) {}
+function parse(equation) {
+  if (equation.match(MULTIPLY_DIVIDE_REGEX)) {
+    handleMath(equation.match(MULTIPLY_DIVIDE_REGEX).groups)
+  }
+}
+
+function handleMath({ operand1, operand2, operation }) {
+  const number1 = parseFloat(operand1)
+  const number2 = parseFloat(operand2)
+
+  switch (operation) {
+    case "*":
+      return number1 * number2
+    case "/":
+      return number1 / number2
+  }
+}
