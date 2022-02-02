@@ -2,6 +2,7 @@ const form = document.querySelector("#equation-form")
 const inputElement = document.querySelector("#equation")
 const outputElement = document.querySelector("#results")
 
+const EXPONENT_REGEX = /(?<operand1>\S+)\s*(?<operation>\^)\s*(?<operand2>\S+)/
 const MULTIPLY_DIVIDE_REGEX =
   /(?<operand1>\S+)\s*(?<operation>[\*\/])\s*(?<operand2>\S+)/
 const ADD_SUBTRACT_REGEX =
@@ -15,7 +16,11 @@ form.addEventListener("submit", e => {
 })
 
 function parse(equation) {
-  if (equation.match(MULTIPLY_DIVIDE_REGEX)) {
+  if (equation.match(EXPONENT_REGEX)) {
+    const result = handleMath(equation.match(EXPONENT_REGEX).groups)
+    const newEquation = equation.replace(EXPONENT_REGEX, result)
+    return parse(newEquation)
+  } else if (equation.match(MULTIPLY_DIVIDE_REGEX)) {
     const result = handleMath(equation.match(MULTIPLY_DIVIDE_REGEX).groups)
     const newEquation = equation.replace(MULTIPLY_DIVIDE_REGEX, result)
     return parse(newEquation)
@@ -24,7 +29,7 @@ function parse(equation) {
     const newEquation = equation.replace(ADD_SUBTRACT_REGEX, result)
     return parse(newEquation)
   } else {
-    return equation
+    return parseFloat(equation)
   }
 }
 
@@ -41,5 +46,7 @@ function handleMath({ operand1, operand2, operation }) {
       return number1 + number2
     case "-":
       return number1 - number2
+    case "^":
+      return number1 ** number2
   }
 }
