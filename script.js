@@ -2,6 +2,7 @@ const form = document.querySelector("#equation-form")
 const inputElement = document.querySelector("#equation")
 const outputElement = document.querySelector("#results")
 
+const PARENTHESIS_REGEX = /\((?<equation>[^\(\)]*)\)/
 const EXPONENT_REGEX = /(?<operand1>\S+)\s*(?<operation>\^)\s*(?<operand2>\S+)/
 const MULTIPLY_DIVIDE_REGEX =
   /(?<operand1>\S+)\s*(?<operation>[\*\/])\s*(?<operand2>\S+)/
@@ -16,7 +17,12 @@ form.addEventListener("submit", e => {
 })
 
 function parse(equation) {
-  if (equation.match(EXPONENT_REGEX)) {
+  if (equation.match(PARENTHESIS_REGEX)) {
+    const subEquation = equation.match(PARENTHESIS_REGEX).groups.equation
+    const result = parse(subEquation)
+    const newEquation = equation.replace(PARENTHESIS_REGEX, result)
+    return parse(newEquation)
+  } else if (equation.match(EXPONENT_REGEX)) {
     const result = handleMath(equation.match(EXPONENT_REGEX).groups)
     const newEquation = equation.replace(EXPONENT_REGEX, result)
     return parse(newEquation)
